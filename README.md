@@ -19,9 +19,10 @@ No **MySQL Workbench**, abra `banco.sql`, selecione tudo e execute. O script cri
 Arquivo `src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/portal_academico?useUnicode=true&characterEncoding=UTF-8
+spring.datasource.url=jdbc:mysql://127.0.0.1:${DB_PORT:3306}/portal_academico
 spring.datasource.username=${DB_USER:root}
 spring.datasource.password=${DB_PASSWORD:}
+server.port=${SERVER_PORT:8080}
 ```
 
 No PowerShell, antes de iniciar a aplicação (exemplo com seu usuário e senha do MySQL):
