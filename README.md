@@ -19,18 +19,23 @@ No **MySQL Workbench**, abra `banco.sql`, selecione tudo e execute. O script cri
 Arquivo `src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://127.0.0.1:${DB_PORT:3306}/portal_academico
+spring.datasource.url=jdbc:mysql://127.0.0.1:${DB_PORT:3306}/portal_academico?useUnicode=true&characterEncoding=UTF-8
 spring.datasource.username=${DB_USER:root}
 spring.datasource.password=${DB_PASSWORD:}
 server.port=${SERVER_PORT:8080}
+
 ```
 
 No PowerShell, antes de iniciar a aplicação (exemplo com seu usuário e senha do MySQL):
 
 ```powershell
 $env:DB_USER="root"
-$env:DB_PASSWORD="SUA_SENHA_MYSQL"
+$env:DB_PORT="3306"
+$env:SERVER_PORT="8080"
+$env:DB_PASSWORD=Read-Host "Senha do MySQL"
 ```
+
+Altere as portas conforme a configuração de cada computador. Por exemplo, para usar o MySQL na porta `3307` e a aplicação na porta `8081`, defina `DB_PORT="3307"` e `SERVER_PORT="8081"`.
 
 Se o MySQL estiver sem senha, não defina `DB_PASSWORD` ou deixe vazio. **Não envie a senha do MySQL ao GitHub.**
 
@@ -42,7 +47,7 @@ Abra um terminal na pasta do projeto:
 mvn spring-boot:run
 ```
 
-Abra no navegador: **http://localhost:8080/login.xhtml**
+Abra no navegador usando a porta configurada. Com a porta padrão, acesse **http://localhost:8080/login.xhtml**; com `SERVER_PORT="8081"`, acesse **http://localhost:8081/login.xhtml**.
 
 ## Usuários de demonstração
 
@@ -64,7 +69,7 @@ Os dados de teste incluem aulas nos **sete dias** para que o painel do aluno pos
 5. **Model:** `Usuario` e `Aula` são as entidades/objetos de dados que atravessam as camadas.
 6. **Spring Boot:** cria/injeta automaticamente `JdbcTemplate`, `@Repository` e `@Service`, e inicia o servidor embutido. JoinFaces integra JSF ao Spring Boot.
 
-Fluxo: **login.xhtml → LoginBean → PortalService → UsuarioDAO → MySQL → redirecionamento → PainelBean → PortalService → AlocacaoDAO → painel.xhtml**.
+Fluxo: **login.xhtml → LoginBean → PortalService → UsuarioDAO → MySQL → redirecionamento → PainelBean → PortalService → AlocacaoDAO → aluno.xhtml ou professor.xhtml**.
 
 ## Perguntas para defesa técnica
 
@@ -92,20 +97,21 @@ Fluxo: **login.xhtml → LoginBean → PortalService → UsuarioDAO → MySQL �
 6. Tente abrir `/professor.xhtml` enquanto estiver autenticado como aluno; o sistema redirecionará para o painel de aluno.
 7. Mostre `banco.sql`, os `SELECT` com `JOIN` nos DAOs e o `@Service`.
 
-## Publicar o código no GitHub
+## Como baixar o projeto do GitHub
 
-Crie um repositório vazio no GitHub e, no terminal desta pasta, execute:
+No terminal, execute:
 
 ```bash
-git init
-git add .
-git commit -m "Portal academico MVC com Spring Boot, JSF e JDBC"
-git branch -M main
-git remote add origin URL_DO_SEU_REPOSITORIO
-git push -u origin main
+git clone https://github.com/GabrielMarquesxz/portal-academico.git
+cd portal-academico
 ```
 
-Substitua `URL_DO_SEU_REPOSITORIO` pelo endereço real do repositório criado.
+Depois, cada integrante deve:
+
+1. Executar `banco.sql` no MySQL Workbench.
+2. Configurar suas variáveis de ambiente.
+3. Executar `mvn spring-boot:run`.
+4. Abrir no navegador o endereço correspondente à porta configurada.
 
 ## Observação
 
