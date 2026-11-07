@@ -1,0 +1,13 @@
+/target/
+/.idea/
+/.vscode/
+*.iml
+
+# Arquivos locais, logs e configurações que podem conter credenciais.
+.env
+.env.*
+!.env.example
+*.log
+erro.txt
+src/main/resources/application-local.properties
+src/main/resources/application-*.local.properties

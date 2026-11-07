@@ -1,0 +1,28 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: #f1f5f9; color: #152238; font: 16px/1.5 Arial, sans-serif; }
+.page { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 60px 20px; }
+.login-page { align-items: center; }
+.card { background: white; width: 100%; border-radius: 16px; padding: 32px; box-shadow: 0 10px 35px #15223813; }
+.login-card { max-width: 430px; }
+.panel-card { max-width: 1060px; overflow-x: auto; }
+.eyebrow { color: #2563eb; font-weight: 700; letter-spacing: 2px; font-size: 12px; }
+h1 { font-size: 30px; margin: 4px 0 8px; }
+h2 { font-size: 19px; margin: 26px 0 16px; }
+.muted, .hint { color: #64748b; }
+.hint { font-size: 12px; margin-top: 20px; }
+label { display: block; font-weight: 600; margin-top: 18px; margin-bottom: 6px; }
+.input { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+.input:focus { outline: 2px solid #93c5fd; border-color: #2563eb; }
+.button { display: inline-block; border: 0; border-radius: 8px; background: #2563eb; color: white; font-weight: 700; padding: 12px 20px; margin-top: 22px; cursor: pointer; }
+.login-card .button { width: 100%; }
+.button:hover { background: #1d4ed8; }
+.secondary { background: #e2e8f0; color: #334155; margin: 0; }
+.secondary:hover { background: #cbd5e1; }
+.alert { display: block; padding: 12px; background: #fef2f2; color: #b91c1c; border-radius: 8px; list-style: none; }
+.field-error { color: #b91c1c; font-size: 13px; }
+.topbar { display: flex; justify-content: space-between; gap: 24px; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 18px; }
+.tabela { width: 100%; border-collapse: collapse; min-width: 680px; }
+.tabela th, .tabela td { padding: 13px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+.tabela th { color: #475569; background: #f8fafc; font-size: 14px; }
+.empty { padding: 20px; background: #f8fafc; color: #64748b; border-radius: 8px; }
+@media (max-width: 600px) { .page { padding: 20px 12px; } .card { padding: 22px; } h1 { font-size: 24px; } .topbar { align-items: flex-start; } }

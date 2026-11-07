@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core" lang="pt-BR">
+<f:metadata>
+    <f:viewAction action="#{painelBean.abrirAluno}" />
+</f:metadata>
+<h:head>
+    <title>Portal Acadêmico | Aluno</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <h:outputStylesheet library="css" name="estilo.css" />
+</h:head>
+<h:body>
+    <main class="page">
+        <section class="card panel-card">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">PAINEL DO ALUNO</p>
+                    <h1>Olá, <h:outputText value="#{painelBean.usuario.nome}" /></h1>
+                    <p class="muted">Turma: <h:outputText value="#{painelBean.usuario.turma}" /></p>
+                </div>
+                <h:form><h:commandButton value="Sair" action="#{painelBean.sair}" styleClass="button secondary" /></h:form>
+            </header>
+            <h2>Suas aulas de hoje</h2>
+            <h:outputText value="#{painelBean.erro}" rendered="#{not empty painelBean.erro}" styleClass="alert" />
+            <h:panelGroup rendered="#{empty painelBean.aulas and empty painelBean.erro}">
+                <p class="empty">Você não possui aulas cadastradas para hoje.</p>
+            </h:panelGroup>
+            <h:dataTable value="#{painelBean.aulas}" var="aula" styleClass="tabela"
+                         rendered="#{not empty painelBean.aulas}" headerClass="tabela-cabecalho">
+                <h:column><f:facet name="header">Disciplina</f:facet>
+                    <h:outputText value="#{aula.disciplina}" />
+                </h:column>
+                <h:column><f:facet name="header">Horário</f:facet>
+                    <h:outputText value="#{aula.horario}" />
+                </h:column>
+                <h:column><f:facet name="header">Tipo</f:facet>
+                    <h:outputText value="#{aula.tipoAula}" />
+                </h:column>
+                <h:column><f:facet name="header">Bloco / Sala</f:facet>
+                    <h:outputText value="#{aula.local}" />
+                </h:column>
+                <h:column><f:facet name="header">Professor</f:facet>
+                    <h:outputText value="#{aula.professor}" />
+                </h:column>
+            </h:dataTable>
+        </section>
+    </main>
+</h:body>
+</html>
