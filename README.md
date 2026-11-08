@@ -1,118 +1,142 @@
-# Portal Acadêmico — Spring Boot + JSF + JDBC (MVC)
+# Portal Acadêmico
 
-Projeto mínimo para a atividade. **Não usa JPA, Hibernate, APIs REST nem Spring Security para login automático.** A autenticação usa SQL via `JdbcTemplate` e comparação do hash de senha com BCrypt.
+Aplicação web desenvolvida em Java para gerenciamento e consulta de informações acadêmicas. O sistema permite a autenticação de usuários e disponibiliza painéis específicos para alunos e professores, apresentando disciplinas, horários e locais das aulas.
 
-## Requisitos para executar
+## Funcionalidades
 
-- JDK 17 ou superior (Java 17 configurado no Maven)
+- **Autenticação:** validação de credenciais armazenadas no MySQL, com verificação de senhas utilizando BCrypt.
+- **Painel do aluno:** consulta das disciplinas do dia, horários, professores e localização das aulas.
+- **Painel do professor:** visualização das alocações semanais, diferenciando salas de aulas teóricas e laboratórios para aulas práticas.
+- **Controle de acesso:** direcionamento automático conforme o perfil autenticado e verificação da sessão do usuário.
+
+## Tecnologias utilizadas
+
+| Tecnologia | Finalidade |
+| --- | --- |
+| Java 17 | Linguagem principal |
+| Spring Boot 3.5 | Configuração, inicialização e injeção de dependências |
+| JSF (Jakarta Faces) | Desenvolvimento das interfaces web |
+| JoinFaces | Integração entre Spring Boot e JSF |
+| Spring JDBC | Persistência utilizando JdbcTemplate |
+| MySQL 8.0 | Banco de dados relacional |
+| BCrypt | Verificação de senhas |
+| Maven | Gerenciamento de dependências |
+
+## Arquitetura
+
+O sistema foi desenvolvido seguindo o padrão arquitetural **MVC (Model-View-Controller)**, complementado por camadas de serviço e persistência.
+
+A organização do código separa a interface, o controle de navegação, as regras de negócio e as operações de banco de dados.
+
+| Camada | Componentes | Responsabilidade |
+| --- | --- | --- |
+| Model | `Usuario`, `Aula` | Representação dos dados |
+| View | `login.xhtml`, `aluno.xhtml`, `professor.xhtml` | Interface com o usuário |
+| Controller | `LoginBean`, `PainelBean` | Controle de interação, sessão e navegação |
+| Service | `PortalService` | Autenticação e regras de negócio |
+| DAO | `UsuarioDAO`, `AlocacaoDAO` | Consultas SQL e acesso aos dados |
+
+### Fluxo de autenticação
+
+`login.xhtml → LoginBean → PortalService → UsuarioDAO → MySQL`
+
+Após a autenticação, o sistema identifica o perfil do usuário e realiza o direcionamento para `aluno.xhtml` ou `professor.xhtml`.
+
+Os dados dos painéis são recuperados por consultas SQL realizadas através do `JdbcTemplate`, utilizando relacionamentos entre tabelas com `JOIN`.
+
+A persistência é implementada diretamente com JDBC, sem utilização de ORM ou JPA.
+
+## Banco de dados
+
+O projeto utiliza MySQL e possui cinco tabelas principais:
+
+| Tabela | Descrição |
+| --- | --- |
+| `perfis` | Identificação dos perfis de acesso |
+| `usuarios` | Dados dos usuários e credenciais |
+| `disciplinas` | Informações das disciplinas |
+| `salas` | Identificação, localização e tipo de sala |
+| `alocacoes` | Associação de disciplinas, professores, turmas, salas e horários |
+
+O arquivo `banco.sql`, localizado na raiz do projeto, contém os comandos para criação da estrutura e inserção dos dados demonstrativos.
+
+**Atenção:** a execução do script recria as tabelas e restaura os dados iniciais.
+
+## Instalação e execução
+
+### Pré-requisitos
+
+- JDK 17 ou superior
 - Maven 3.9 ou superior
-- MySQL 8.0 funcionando
+- MySQL 8.0
 
-## Passo 1 — criar o banco
+### 1. Clonar o repositório
 
-No **MySQL Workbench**, abra `banco.sql`, selecione tudo e execute. O script cria o banco `portal_academico`, cinco tabelas e quatro usuários de demonstração.
+```powershell
+git clone https://github.com/GabrielMarquesxz/portal-academico.git
+cd portal-academico
+```
 
-> **Atenção:** executar o script novamente apaga e recria essas cinco tabelas com os dados de demonstração.
+### 2. Configurar o banco de dados
 
-## Passo 2 — configurar a conexão
+Abra o arquivo `banco.sql` no MySQL Workbench e execute o script para criar o banco `portal_academico` e seus dados iniciais.
 
-Arquivo `src/main/resources/application.properties`:
+### 3. Configurar a conexão
+
+O arquivo `src/main/resources/application.properties` utiliza variáveis de ambiente para definir a conexão:
 
 ```properties
 spring.datasource.url=jdbc:mysql://127.0.0.1:${DB_PORT:3306}/portal_academico?useUnicode=true&characterEncoding=UTF-8
 spring.datasource.username=${DB_USER:root}
 spring.datasource.password=${DB_PASSWORD:}
-server.port=${SERVER_PORT:8080}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
+joinfaces.faces-servlet.url-mappings=*.xhtml
+server.port=${SERVER_PORT:8080}
 ```
 
-No PowerShell, antes de iniciar a aplicação (exemplo com seu usuário e senha do MySQL):
+Exemplo de configuração no PowerShell:
 
 ```powershell
 $env:DB_USER="root"
 $env:DB_PORT="3306"
 $env:SERVER_PORT="8080"
-$env:DB_PASSWORD=Read-Host "Senha do MySQL"
+$env:DB_PASSWORD = Read-Host "Senha do MySQL"
 ```
 
-Altere as portas conforme a configuração de cada computador. Por exemplo, para usar o MySQL na porta `3307` e a aplicação na porta `8081`, defina `DB_PORT="3307"` e `SERVER_PORT="8081"`.
+As variáveis devem ser ajustadas de acordo com o ambiente de execução.
 
-Se o MySQL estiver sem senha, não defina `DB_PASSWORD` ou deixe vazio. **Não envie a senha do MySQL ao GitHub.**
+### 4. Executar a aplicação
 
-## Passo 3 — executar
-
-Abra um terminal na pasta do projeto:
+No terminal, a partir da raiz do projeto:
 
 ```powershell
 mvn spring-boot:run
 ```
 
-Abra no navegador usando a porta configurada. Com a porta padrão, acesse **http://localhost:8080/login.xhtml**; com `SERVER_PORT="8081"`, acesse **http://localhost:8081/login.xhtml**.
+Com a configuração padrão, a aplicação estará disponível em:
+
+**http://localhost:8080/login.xhtml**
 
 ## Usuários de demonstração
 
-| Login | Senha de teste | Perfil | Resultado |
-| --- | --- | --- | --- |
-| `aluno1` | `senha123` | Aluno (Ana) | Aulas de hoje da turma ADS1 |
-| `aluno2` | `senha123` | Aluno (Bruno) | Aulas de hoje da turma ADS2 |
-| `prof1` | `senha123` | Professor (Carla) | Alocações da semana |
-| `prof2` | `senha123` | Professor (Daniel) | Alocações da semana |
+O banco de dados inclui quatro contas para testes funcionais.
 
-Os dados de teste incluem aulas nos **sete dias** para que o painel do aluno possa ser demonstrado em qualquer dia. Em cenário real, ajustaríamos para os dias letivos. Os dois professores possuem alocações teóricas e práticas.
+| Usuário | Senha | Perfil |
+| --- | --- | --- |
+| `aluno1` | `senha123` | Aluno — Ana Souza |
+| `aluno2` | `senha123` | Aluno — Bruno Lima |
+| `prof1` | `senha123` | Professor — Carla Mendes |
+| `prof2` | `senha123` | Professor — Daniel Costa |
 
-## Arquitetura MVC — como explicar
+As senhas são exclusivas do ambiente demonstrativo e são armazenadas no banco utilizando hashes BCrypt.
 
-1. **View (`.xhtml`):** apresenta o formulário e os painéis. Usa `<h:form>`, `<h:inputText>`, `<h:inputSecret>`, `<h:commandButton>` e `<h:dataTable>`.
-2. **Controller (`bean`):** `LoginBean` recebe login/senha; `PainelBean` verifica a sessão, escolhe a página e carrega os dados. Ambos usam `@Named` e `@ViewScoped`.
-3. **Service:** `PortalService` valida o hash BCrypt e aplica regras de perfil (`ALUNO`/`PROFESSOR`).
-4. **DAO:** `UsuarioDAO` executa `SELECT` de login com `JOIN perfis`; `AlocacaoDAO` executa SQL com `JOIN` de alocações, salas, disciplinas e usuários.
-5. **Model:** `Usuario` e `Aula` são as entidades/objetos de dados que atravessam as camadas.
-6. **Spring Boot:** cria/injeta automaticamente `JdbcTemplate`, `@Repository` e `@Service`, e inicia o servidor embutido. JoinFaces integra JSF ao Spring Boot.
+## Escopo do projeto
 
-Fluxo: **login.xhtml → LoginBean → PortalService → UsuarioDAO → MySQL → redirecionamento → PainelBean → PortalService → AlocacaoDAO → aluno.xhtml ou professor.xhtml**.
+O Portal Acadêmico implementa as funcionalidades essenciais de autenticação, consulta de aulas e direcionamento por perfil.
 
-## Perguntas para defesa técnica
+A aplicação apresenta uma arquitetura modular, com separação das responsabilidades entre interface, regras de negócio e persistência.
 
-- **Por que usamos MVC?** Para separar a interface, o controle, a regra de negócio e as operações no banco; cada arquivo possui uma responsabilidade.
-- **O que é DAO?** Padrão para isolar comandos SQL e conversão de linhas em objetos Java.
-- **O que faz `@Service`?** Marca a classe de regras de negócio como gerenciada pelo Spring.
-- **O que faz `@Repository`?** Marca a classe DAO; as falhas JDBC são traduzidas para `DataAccessException`.
-- **O que é injeção de dependências?** O Spring fornece os DAOs ao Service, o JdbcTemplate aos DAOs e o Service aos Beans, sem `new` manual desses componentes.
-- **Por que `JdbcTemplate`?** Executa SQL diretamente, usa parâmetros `?`, evita concatenação perigosa e fecha recursos JDBC automaticamente.
-- **Por que `JOIN`?** As informações estão em tabelas relacionadas; JOIN reúne disciplina, sala, alocação e professor em uma consulta.
-- **Por que `@ViewScoped`?** Mantém os dados do Bean durante a interação com a mesma página JSF sem torná-los globais para todos os usuários.
-- **Onde o login é validado?** O DAO consulta o login no MySQL e o Service compara a senha fornecida com o hash BCrypt recuperado do banco.
-- **Como se impede acesso ao painel errado?** A ação `f:viewAction` chama `PainelBean` ao abrir a página; ele verifica o usuário autenticado na sessão e seu perfil. O Service também verifica o perfil antes de consultar aulas.
-- **Como são tratados erros SQL?** `JdbcTemplate` transforma a exceção JDBC em `DataAccessException`, tratada nos Beans para exibir mensagem sem mostrar detalhes internos do banco.
-- **Por que a senha não está em texto puro no banco?** O banco armazena hash BCrypt com salt; a comparação é feita sem recuperar a senha original.
-- **Qual é a diferença entre a visão de aluno e professor?** O aluno consulta a turma e o dia atual; o professor consulta seu ID em toda a semana, distinguindo salas teóricas e laboratórios.
+O sistema utiliza uma implementação simplificada de autenticação e não contempla funcionalidades administrativas, gerenciamento de matrículas ou edição de horários pela interface.
 
-## Sequência sugerida da demonstração
-
-1. Tente entrar com senha incorreta e mostre a mensagem.
-2. Entre como `aluno1` e mostre disciplina, horário, bloco e sala.
-3. Saia, entre como `aluno2` e compare o conteúdo.
-4. Entre como `prof1` e mostre uma aula teórica e outra prática (laboratório).
-5. Saia e entre como `prof2` para provar que as alocações são separadas por professor.
-6. Tente abrir `/professor.xhtml` enquanto estiver autenticado como aluno; o sistema redirecionará para o painel de aluno.
-7. Mostre `banco.sql`, os `SELECT` com `JOIN` nos DAOs e o `@Service`.
-
-## Como baixar o projeto do GitHub
-
-No terminal, execute:
-
-```bash
-git clone https://github.com/GabrielMarquesxz/portal-academico.git
-cd portal-academico
-```
-
-Depois, cada integrante deve:
-
-1. Executar `banco.sql` no MySQL Workbench.
-2. Configurar suas variáveis de ambiente.
-3. Executar `mvn spring-boot:run`.
-4. Abrir no navegador o endereço correspondente à porta configurada.
-
-## Observação
-
-Este projeto é acadêmico e simplificado. Um sistema real precisaria de gestão de matrículas, políticas de senha e controles adicionais de segurança. As senhas `senha123` existem apenas para a demonstração. Os arquivos foram preparados para execução local; o banco e o servidor precisam ser testados no computador da equipe.
+Para utilização em produção, seriam necessários controles adicionais de segurança, gerenciamento de usuários e procedimentos de manutenção dos dados.
