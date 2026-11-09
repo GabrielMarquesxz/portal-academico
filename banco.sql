@@ -56,12 +56,20 @@ CREATE TABLE alocacoes (
 INSERT INTO perfis (id, nome) VALUES
     (1, 'ALUNO'), (2, 'PROFESSOR');
 
--- Quatro usuários; senha de TESTE: senha123 (hash BCrypt, não texto puro).
+-- Cinco usuários; senha de TESTE: senha123 (hash BCrypt, não texto puro).
 INSERT INTO usuarios (id, nome, login, senha_hash, perfil_id, turma) VALUES
     (1, 'Ana Souza', 'aluno1', '$2y$10$8dnSUK6G9WjL.zhQtoxHM.gRZhvf8eH/S73X54Uofa6nR6Ku4SOwO', 1, 'ADS1'),
     (2, 'Bruno Lima', 'aluno2', '$2y$10$r7W3aMeTTJouI/NNR9Kp2.3p8YuXHDmCPadp.XLYm.NRhJaVjjk92', 1, 'ADS2'),
     (3, 'Carla Mendes', 'prof1', '$2y$10$y6mjSo.wyChNud7YuskZ7uV0T7nEbReFqzUVKIJuPQM95iJ1dn6iO', 2, NULL),
     (4, 'Daniel Costa', 'prof2', '$2y$10$8kQ/VLz0AWs2cI2mKpwChuYufy0xDz82r1KVxSEdyO0Rd9Az9kWGO', 2, NULL);
+
+INSERT INTO usuarios
+    (id, nome, login, senha_hash, perfil_id, turma)
+SELECT
+    5, 'Marcos Oliveira', 'prof3',
+    senha_hash, perfil_id, NULL
+FROM usuarios
+WHERE login = 'prof1';
 
 INSERT INTO salas (id, bloco, numero, tipo) VALUES
     (1, 'A', '101', 'TEORICA'),
@@ -71,7 +79,7 @@ INSERT INTO disciplinas (id, nome) VALUES
     (1, 'Banco de Dados'),
     (2, 'Programação Web');
 
--- Turmas com aulas nos 7 dias somente para garantir uma demonstração em qualquer dia.
+-- Turmas com aulas de segunda a sexta-feira.
 -- Cada professor tem aulas teóricas e práticas durante a semana.
 INSERT INTO alocacoes
     (disciplina_id, professor_id, turma, sala_id, dia_semana, hora_inicio, hora_fim)
@@ -85,8 +93,4 @@ VALUES
   (1, 3, 'ADS1', 2, 4, '08:00:00', '09:40:00'),
   (2, 4, 'ADS2', 1, 4, '14:00:00', '15:40:00'),
   (1, 3, 'ADS1', 1, 5, '08:00:00', '09:40:00'),
-  (2, 4, 'ADS2', 2, 5, '14:00:00', '15:40:00'),
-  (1, 3, 'ADS1', 2, 6, '08:00:00', '09:40:00'),
-  (2, 4, 'ADS2', 1, 6, '14:00:00', '15:40:00'),
-  (1, 3, 'ADS1', 1, 7, '08:00:00', '09:40:00'),
-  (2, 4, 'ADS2', 2, 7, '14:00:00', '15:40:00');
+  (2, 4, 'ADS2', 2, 5, '14:00:00', '15:40:00');

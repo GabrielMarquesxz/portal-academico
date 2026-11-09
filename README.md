@@ -120,7 +120,7 @@ Com a configuração padrão, a aplicação estará disponível em:
 
 ## Usuários de demonstração
 
-O banco de dados inclui quatro contas para testes funcionais.
+O banco de dados inclui cinco contas para testes funcionais.
 
 | Usuário | Senha | Perfil |
 | --- | --- | --- |
@@ -128,6 +128,7 @@ O banco de dados inclui quatro contas para testes funcionais.
 | `aluno2` | `senha123` | Aluno — Bruno Lima |
 | `prof1` | `senha123` | Professor — Carla Mendes |
 | `prof2` | `senha123` | Professor — Daniel Costa |
+| `prof3` | `senha123` | Professor — Marcos Oliveira |
 
 As senhas são exclusivas do ambiente demonstrativo e são armazenadas no banco utilizando hashes BCrypt.
 
