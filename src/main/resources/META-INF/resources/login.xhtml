@@ -1,30 +1,48 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html" lang="pt-BR">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" lang="pt-BR">
 <h:head>
-    <title>Portal Acadêmico | Login</title>
+    <title>Portal Acadêmico | Acesso</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <h:outputStylesheet library="css" name="estilo.css" />
 </h:head>
 <h:body>
-    <main class="page login-page">
-        <section class="card login-card">
-            <p class="eyebrow">PORTAL ACADÊMICO</p>
-            <h1>Entrar</h1>
-            <p class="muted">Consulte suas aulas, horários e salas.</p>
-            <h:form id="loginForm">
-                <h:messages globalOnly="true" styleClass="alert" />
-                <h:outputLabel for="login" value="Usuário" />
-                <h:inputText id="login" value="#{loginBean.login}" required="true"
-                             requiredMessage="Informe o usuário." styleClass="input" />
-                <h:message for="login" styleClass="field-error" />
-                <h:outputLabel for="senha" value="Senha" />
-                <h:inputSecret id="senha" value="#{loginBean.senha}" required="true"
-                               requiredMessage="Informe a senha." styleClass="input" />
-                <h:message for="senha" styleClass="field-error" />
-                <h:commandButton value="Entrar" action="#{loginBean.entrar}" styleClass="button" />
-            </h:form>
-            <p class="hint">Acesso demonstrativo para alunos e professores.</p>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand"><h:graphicImage library="images" name="portal-livros.png"
+                                                       styleClass="brand-logo" alt="Portal Acadêmico" />
+                <span class="brand-copy"><strong>PORTAL ACADÊMICO</strong></span></div>
+            <span class="header-caption">Acesso acadêmico</span>
+        </div>
+    </header>
+    <main class="login-layout">
+        <section class="login-showcase" aria-label="Sobre o portal">
+            <h1>Sua rotina acadêmica,<br /><em>em um só lugar.</em></h1>
+            <p>Acesse suas disciplinas, acompanhe seus horários e encontre a sala certa para cada aula.</p>
+            <div class="login-benefits">
+                <div class="benefit"><span class="benefit-icon">01</span><span><strong>Grade organizada</strong><small>Consulte o dia ou a semana</small></span></div>
+                <div class="benefit"><span class="benefit-icon">02</span><span><strong>Localização clara</strong><small>Blocos, salas e laboratórios</small></span></div>
+            </div>
+            <div class="showcase-shape" aria-hidden="true"></div>
+        </section>
+        <section class="login-side">
+            <div class="login-card">
+                <span class="small-label">BEM-VINDO(A)</span>
+                <h2>Entrar no portal</h2>
+                <p class="muted">Use suas credenciais para continuar.</p>
+                <h:form id="loginForm">
+                    <h:messages globalOnly="true" styleClass="alert" />
+                    <h:outputLabel for="login" value="Usuário" />
+                    <h:inputText id="login" value="#{loginBean.login}" required="true"
+                                 requiredMessage="Informe o usuário." styleClass="input" />
+                    <h:message for="login" styleClass="field-error" />
+                    <h:outputLabel for="senha" value="Senha" />
+                    <h:inputSecret id="senha" value="#{loginBean.senha}" required="true"
+                                   requiredMessage="Informe a senha." styleClass="input" />
+                    <h:message for="senha" styleClass="field-error" />
+                    <h:commandButton value="Acessar minha conta" action="#{loginBean.entrar}" styleClass="button button-primary button-full" />
+                </h:form>
+                <div class="login-footnote"><span class="status-dot"></span> Acesso para estudantes, docentes e coordenação</div>
+            </div>
         </section>
     </main>
 </h:body>

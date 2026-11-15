@@ -1,49 +1,119 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core" lang="pt-BR">
-<f:metadata>
-    <f:viewAction action="#{painelBean.abrirProfessor}" />
-</f:metadata>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core" lang="pt-BR">
+<f:metadata><f:viewAction action="#{painelBean.abrirProfessor}" /></f:metadata>
 <h:head>
-    <title>Portal Acadêmico | Professor</title>
+    <title>Portal Acadêmico | PROFESSOR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <h:outputStylesheet library="css" name="estilo.css" />
 </h:head>
 <h:body>
-    <main class="page">
-        <section class="card panel-card">
-            <header class="topbar">
-                <div>
-                    <p class="eyebrow">PAINEL DO PROFESSOR</p>
-                    <h1>Olá, <h:outputText value="#{painelBean.usuario.nome}" /></h1>
-                    <p class="muted">Alocação semanal de aulas e laboratórios</p>
-                </div>
-                <h:form><h:commandButton value="Sair" action="#{painelBean.sair}" styleClass="button secondary" /></h:form>
-            </header>
-            <h2>Suas alocações</h2>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand"><h:graphicImage library="images" name="portal-livros.png"
+                                                       styleClass="brand-logo" alt="Portal Acadêmico" />
+                <span class="brand-copy"><strong>PORTAL ACADÊMICO</strong></span></div>
+            <div class="header-controls">
+                <span class="header-user"><h:outputText value="#{painelBean.usuario.nome}" /></span>
+                <h:form><h:commandButton value="Sair da conta" action="#{painelBean.sair}" styleClass="button button-logout" /></h:form>
+            </div>
+        </div>
+    </header>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <p class="nav-caption">MENU PRINCIPAL</p>
+            <nav class="side-nav" aria-label="Navegação do portal">
+                <a href="#inicio" class="nav-link nav-active"><span class="nav-icon">▦</span> Visão geral</a>
+                <a href="#grade" class="nav-link"><span class="nav-icon">▤</span> Grade de aulas</a>
+                <a href="#perfil" class="nav-link"><span class="nav-icon">◉</span> Meu perfil</a>
+            </nav>
+        </aside>
+        <main class="dashboard" id="inicio">
+            <div class="page-topline"><span>INÍCIO / PROFESSOR</span><time><h:outputText value="#{painelBean.dataHoje}" /></time></div>
+            <div class="page-heading"><div><span class="small-label">ÁREA DO PROFESSOR</span>
+                <h1>Painel docente</h1>
+                <p class="muted">Consulte suas turmas e confira onde cada aula acontece.</p></div>
+                <div class="user-pill"><span class="avatar-circle">●</span><span><strong><h:outputText value="#{painelBean.usuario.nome}" /></strong>
+                <small>Alocações de ensino</small></span></div></div>
+
+            <section class="stats-grid" aria-label="Resumo acadêmico">
+                <article class="stat-card"><div class="stat-top"><span>HOJE</span><span class="stat-icon">▦</span></div>
+                    <strong class="stat-number"><h:outputText value="#{painelBean.totalAulasHoje}" /></strong>
+                    <small>Aulas previstas hoje</small></article>
+                <article class="stat-card"><div class="stat-top"><span>SEMANA</span><span class="stat-icon">▤</span></div>
+                    <strong class="stat-number"><h:outputText value="#{painelBean.totalAulasSemana}" /></strong>
+                    <small>Total de alocações</small></article>
+                <article class="stat-card"><div class="stat-top"><span>LABORATÓRIO</span><span class="stat-icon">◫</span></div>
+                    <strong class="stat-number"><h:outputText value="#{painelBean.totalLaboratorios}" /></strong>
+                    <small>Aulas práticas na semana</small></article>
+                <article class="stat-card"><div class="stat-top"><span>DIAS LETIVOS</span><span class="stat-icon">◷</span></div>
+                    <strong class="stat-number"><h:outputText value="#{painelBean.totalDiasComAula}" /></strong>
+                    <small>Dias com aulas na semana</small></article>
+            </section>
+
             <h:outputText value="#{painelBean.erro}" rendered="#{not empty painelBean.erro}" styleClass="alert" />
-            <h:panelGroup rendered="#{empty painelBean.aulas and empty painelBean.erro}">
-                <p class="empty">Você não possui alocações cadastradas.</p>
-            </h:panelGroup>
-            <h:dataTable value="#{painelBean.aulas}" var="aula" styleClass="tabela"
-                         rendered="#{not empty painelBean.aulas}" headerClass="tabela-cabecalho">
-                <h:column><f:facet name="header">Dia</f:facet>
-                    <h:outputText value="#{aula.diaTexto}" />
-                </h:column>
-                <h:column><f:facet name="header">Disciplina</f:facet>
-                    <h:outputText value="#{aula.disciplina}" />
-                </h:column>
-                <h:column><f:facet name="header">Horário</f:facet>
-                    <h:outputText value="#{aula.horario}" />
-                </h:column>
-                <h:column><f:facet name="header">Tipo de aula</f:facet>
-                    <h:outputText value="#{aula.tipoAula}" />
-                </h:column>
-                <h:column><f:facet name="header">Bloco / Sala</f:facet>
-                    <h:outputText value="#{aula.local}" />
-                </h:column>
-            </h:dataTable>
-        </section>
-    </main>
+            <section class="content-card" id="hoje">
+                <div class="section-header"><div><span class="section-eyebrow">AGENDA ATUAL</span><h2>Suas aulas de hoje</h2>
+                    <p class="muted">Horários e locais da programação do dia.</p></div>
+                    <span class="soft-badge">Hoje</span>
+                </div>
+                <h:panelGroup layout="block" rendered="#{empty painelBean.aulasHoje and empty painelBean.erro}" styleClass="empty-state">
+                    <span class="empty-icon">▦</span><strong>Nenhuma atividade hoje</strong>
+                    <p>Nenhuma alocação para hoje.</p>
+                </h:panelGroup>
+                <h:panelGroup layout="block" rendered="#{not empty painelBean.aulasHoje}" styleClass="lesson-list">
+                    <ui:repeat xmlns:ui="jakarta.faces.facelets" value="#{painelBean.aulasHoje}" var="aula">
+                        <article class="lesson-row"><div class="timebox"><strong><h:outputText value="#{aula.horario}" /></strong><small>Horário</small></div>
+                            <div class="lesson-main"><strong><h:outputText value="#{aula.disciplina}" /></strong>
+                            <small>Turma: <h:outputText value="#{aula.turma}" /></small></div>
+                            <div class="lesson-location"><strong><h:outputText value="#{aula.local}" /></strong>
+                            <h:outputText value="#{aula.tipoAula}" styleClass="#{aula.tipoSala eq 'LABORATORIO' ? 'chip chip-lab' : 'chip chip-theory'}" /></div>
+                        </article>
+                    </ui:repeat>
+                </h:panelGroup>
+            </section>
+
+            <section class="content-card" id="grade">
+                <div class="section-header"><div><span class="section-eyebrow">PLANEJAMENTO</span><h2>Minhas alocações</h2>
+                    <p class="muted">Consulte a semana inteira ou selecione um dia específico.</p></div>
+                    <span class="soft-badge"><h:outputText value="#{painelBean.totalAulasSemana}" /> aulas</span>
+                </div>
+                <h:form id="gradeForm" styleClass="day-filters">
+                    <h:commandButton value="Toda semana" action="#{painelBean.filtrarDia(0)}"
+                                     styleClass="#{painelBean.diaSelecionado eq 0 ? 'day-btn day-active' : 'day-btn'}" />
+                    <h:commandButton value="Seg" action="#{painelBean.filtrarDia(1)}" styleClass="#{painelBean.diaSelecionado eq 1 ? 'day-btn day-active' : 'day-btn'}" />
+                    <h:commandButton value="Ter" action="#{painelBean.filtrarDia(2)}" styleClass="#{painelBean.diaSelecionado eq 2 ? 'day-btn day-active' : 'day-btn'}" />
+                    <h:commandButton value="Qua" action="#{painelBean.filtrarDia(3)}" styleClass="#{painelBean.diaSelecionado eq 3 ? 'day-btn day-active' : 'day-btn'}" />
+                    <h:commandButton value="Qui" action="#{painelBean.filtrarDia(4)}" styleClass="#{painelBean.diaSelecionado eq 4 ? 'day-btn day-active' : 'day-btn'}" />
+                    <h:commandButton value="Sex" action="#{painelBean.filtrarDia(5)}" styleClass="#{painelBean.diaSelecionado eq 5 ? 'day-btn day-active' : 'day-btn'}" />
+                    <h:commandButton value="Sáb" action="#{painelBean.filtrarDia(6)}" styleClass="#{painelBean.diaSelecionado eq 6 ? 'day-btn day-active' : 'day-btn'}" />
+                    <h:commandButton value="Dom" action="#{painelBean.filtrarDia(7)}" styleClass="#{painelBean.diaSelecionado eq 7 ? 'day-btn day-active' : 'day-btn'}" />
+                </h:form>
+                <div class="table-caption"><strong><h:outputText value="#{painelBean.periodoSelecionado}" /></strong>
+                    <span><h:outputText value="#{painelBean.aulas.size()}" /> registro(s)</span></div>
+                <h:panelGroup layout="block" styleClass="empty-state" rendered="#{empty painelBean.aulas and empty painelBean.erro}">
+                    <span class="empty-icon">▦</span><strong>Sem aulas no período</strong><p>Você não possui alocações neste período.</p>
+                </h:panelGroup>
+                <div class="table-wrap">
+                    <h:dataTable value="#{painelBean.aulas}" var="aula" styleClass="tabela" rendered="#{not empty painelBean.aulas}" headerClass="tabela-cabecalho">
+                        <h:column><f:facet name="header">Dia</f:facet><h:outputText value="#{aula.diaTexto}" /></h:column>
+                        <h:column><f:facet name="header">Disciplina</f:facet><h:outputText value="#{aula.disciplina}" /></h:column>
+                        <h:column><f:facet name="header">Turma</f:facet><h:outputText value="#{aula.turma}" /></h:column>
+                        <h:column><f:facet name="header">Horário</f:facet><h:outputText value="#{aula.horario}" /></h:column>
+                        <h:column><f:facet name="header">Tipo</f:facet><h:outputText value="#{aula.tipoAula}" styleClass="#{aula.tipoSala eq 'LABORATORIO' ? 'chip chip-lab' : 'chip chip-theory'}" /></h:column>
+                        <h:column><f:facet name="header">Localização</f:facet><h:outputText value="#{aula.local}" /></h:column>
+                        <h:column><f:facet name="header">Professor</f:facet><h:outputText value="#{aula.professor}" /></h:column>
+                    </h:dataTable>
+                </div>
+            </section>
+
+            <section class="content-card profile-card" id="perfil"><div><span class="section-eyebrow">DADOS DA CONTA</span><h2>Meu perfil</h2>
+                <p class="muted">Dados básicos da conta autenticada.</p></div>
+                <div class="profile-content"><div><small>Nome completo</small><strong><h:outputText value="#{painelBean.usuario.nome}" /></strong></div>
+                    <div><small>Tipo de acesso</small><strong>PROFESSOR</strong></div>
+                    <div><small>Vínculo</small><strong>Professor(a) · Corpo docente</strong></div>
+                </div>
+            </section>
+        </main>
+    </div>
 </h:body>
 </html>

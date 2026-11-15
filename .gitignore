@@ -1,13 +1,36 @@
+# Build do Maven e arquivos compilados
 /target/
+*.class
+
+# IDEs e ferramentas locais
 /.idea/
 /.vscode/
+/.github/modernize/
 *.iml
 
-# Arquivos locais, logs e configurações que podem conter credenciais.
+# Credenciais e configurações exclusivas da máquina
 .env
 .env.*
 !.env.example
-*.log
-erro.txt
 src/main/resources/application-local.properties
 src/main/resources/application-*.local.properties
+
+# Logs, relatórios e automações de navegador
+*.log
+erro.txt
+/logs/
+/.playwright-mcp/
+hs_err_pid*.log
+replay_pid*.log
+
+# Backups e exportações locais do banco
+/backup/
+/backups/
+*.bak
+*.dump
+*.sql.bak
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+Desktop.ini

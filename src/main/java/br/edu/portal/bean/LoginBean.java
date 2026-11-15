@@ -35,9 +35,12 @@ public class LoginBean implements Serializable {
             ExternalContext contexto = FacesContext.getCurrentInstance().getExternalContext();
             contexto.invalidateSession(); // Cria uma sessão nova após a autenticação.
             contexto.getSessionMap().put("usuario", usuario);
-            return "ALUNO".equals(usuario.getPerfil())
-                    ? "/aluno.xhtml?faces-redirect=true"
-                    : "/professor.xhtml?faces-redirect=true";
+            return switch (usuario.getPerfil()) {
+                case "ALUNO" -> "/aluno.xhtml?faces-redirect=true";
+                case "PROFESSOR" -> "/professor.xhtml?faces-redirect=true";
+                case "ADMIN" -> "/admin.xhtml?faces-redirect=true";
+                default -> "/login.xhtml?faces-redirect=true";
+            };
         } catch (DataAccessException ex) {
             mensagem("Não foi possível consultar o banco de dados.");
             return null;

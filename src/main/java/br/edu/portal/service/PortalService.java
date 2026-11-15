@@ -41,6 +41,13 @@ public class PortalService {
         return alocacaoDAO.buscarDoAluno(usuario.getTurma(), diaSemana);
     }
 
+    public List<Aula> aulasDaSemanaDoAluno(Usuario usuario) {
+        if (!"ALUNO".equals(usuario.getPerfil())) {
+            throw new IllegalArgumentException("Perfil não autorizado");
+        }
+        return alocacaoDAO.buscarSemanaDoAluno(usuario.getTurma());
+    }
+
     public List<Aula> aulasDoProfessor(Usuario usuario) {
         if (!"PROFESSOR".equals(usuario.getPerfil())) {
             throw new IllegalArgumentException("Perfil não autorizado");

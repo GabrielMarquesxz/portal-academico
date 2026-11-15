@@ -1,143 +1,114 @@
-# Portal Acadêmico
+# Portal Acadêmico — versão 4 (Gestão Acadêmica)
 
-Aplicação web desenvolvida em Java para gerenciamento e consulta de informações acadêmicas. O sistema permite a autenticação de usuários e disponibiliza painéis específicos para alunos e professores, apresentando disciplinas, horários e locais das aulas.
+Aplicação Java para consulta de aulas e **gestão acadêmica**, com Spring Boot, JSF (JoinFaces), JDBC/JdbcTemplate e MySQL. A interface em verde, branco e laranja é inspirada na identidade visual da UNICEPLAC, mas **não é um sistema oficial da instituição**.
 
 ## Funcionalidades
 
-- **Autenticação:** validação de credenciais armazenadas no MySQL, com verificação de senhas utilizando BCrypt.
-- **Painel do aluno:** consulta das disciplinas do dia, horários, professores e localização das aulas.
-- **Painel do professor:** visualização das alocações semanais, diferenciando salas de aulas teóricas e laboratórios para aulas práticas.
-- **Controle de acesso:** direcionamento automático conforme o perfil autenticado e verificação da sessão do usuário.
+- **Aluno:** vê aulas de hoje e a grade semanal de sua turma; filtra por dia.
+- **Professor:** vê suas alocações da semana, a agenda do dia, o tipo de sala e a turma.
+- **Coordenação (`ADMIN`):** cadastra turmas, alunos, professores, salas/laboratórios e disciplinas; cadastra e exclui alocações; consulta todos os registros administrativos.
+- **Cadastros integrados:** qualquer professor, turma, disciplina ou ambiente criado no painel fica imediatamente disponível no formulário de alocações.
+- **Senhas:** novos usuários recebem perfil automaticamente e a senha inicial é armazenada somente como hash BCrypt.
+- **Integridade:** login e código de turma únicos, validação de turma existente, bloqueio de salas duplicadas e disciplinas repetidas sem diferenciar maiúsculas e minúsculas.
+- **Validações do cadastro:** campos obrigatórios, referências válidas, horário de início menor que término, apenas segunda a sexta e ausência de sobreposição de horário para **sala, professor e turma**.
+- Login validado no MySQL, senha demonstrativa protegida por hash BCrypt, sessão e autorização por perfil.
 
-## Tecnologias utilizadas
+Os cadastros administrativos são persistidos diretamente no MySQL. O painel do aluno consulta aulas pelo código da turma e o painel do professor pelo seu ID; por isso uma nova alocação aparece nos dois painéis ao abrir ou recarregar a página.
 
-| Tecnologia | Finalidade |
-| --- | --- |
-| Java 17 | Linguagem principal |
-| Spring Boot 3.5 | Configuração, inicialização e injeção de dependências |
-| JSF (Jakarta Faces) | Desenvolvimento das interfaces web |
-| JoinFaces | Integração entre Spring Boot e JSF |
-| Spring JDBC | Persistência utilizando JdbcTemplate |
-| MySQL 8.0 | Banco de dados relacional |
-| BCrypt | Verificação de senhas |
-| Maven | Gerenciamento de dependências |
+## Tecnologias e arquitetura
 
-## Arquitetura
+- **Java 17**, Spring Boot **3.5.15**, JoinFaces **5.5.15**, MySQL 8, Maven 3.9+.
+- **View:** `login.xhtml`, `aluno.xhtml`, `professor.xhtml` e `admin.xhtml` (JSF/Facelets).
+- **Controller:** `LoginBean`, `PainelBean`, `AdminBean`.
+- **Service:** `PortalService` (login e consultas por perfil) e `AdminService` (autorização, validações, BCrypt e transações administrativas).
+- **DAO:** `UsuarioDAO`, `AlocacaoDAO` e `AdminDAO` (SQL parametrizado com JdbcTemplate).
+- **Model:** `Usuario`, `UsuarioAdministrado`, `Aula`, `Turma`, `Sala`, `Disciplina` e `Opcao`.
 
-O sistema foi desenvolvido seguindo o padrão arquitetural **MVC (Model-View-Controller)**, complementado por camadas de serviço e persistência.
+O `AdminService` valida o perfil `ADMIN` no backend em todas as operações. Os métodos de escrita executam transações (`@Transactional`) e bloqueiam uma linha do perfil `ADMIN`, serializando validações e inserções feitas pelo portal. Para alocações, o serviço verifica sobreposição de sala, professor e turma antes do `INSERT`. Outras aplicações que escrevam diretamente no banco precisam respeitar as mesmas regras.
 
-A organização do código separa a interface, o controle de navegação, as regras de negócio e as operações de banco de dados.
+### Estrutura do banco
 
-| Camada | Componentes | Responsabilidade |
-| --- | --- | --- |
-| Model | `Usuario`, `Aula` | Representação dos dados |
-| View | `login.xhtml`, `aluno.xhtml`, `professor.xhtml` | Interface com o usuário |
-| Controller | `LoginBean`, `PainelBean` | Controle de interação, sessão e navegação |
-| Service | `PortalService` | Autenticação e regras de negócio |
-| DAO | `UsuarioDAO`, `AlocacaoDAO` | Consultas SQL e acesso aos dados |
+- `perfis`: perfis ALUNO, PROFESSOR e ADMIN.
+- `turmas`: código único, descrição e curso opcional.
+- `usuarios`: alunos, professores e administradores; alunos mantêm o código textual da turma por compatibilidade.
+- `salas`: bloco, número e tipo `TEORICA` ou `LABORATORIO`.
+- `disciplinas`: catálogo de componentes curriculares.
+- `alocacoes`: relaciona disciplina, professor, turma, sala, dia e horário.
 
-### Fluxo de autenticação
+As colunas `usuarios.turma` e `alocacoes.turma` continuam textuais, mas agora referenciam `turmas.codigo`. Isso preserva as consultas e os dados anteriores.
 
-`login.xhtml → LoginBean → PortalService → UsuarioDAO → MySQL`
+## Instalação
 
-Após a autenticação, o sistema identifica o perfil do usuário e realiza o direcionamento para `aluno.xhtml` ou `professor.xhtml`.
+**Pré-requisitos:** JDK 17+, Maven 3.9+ e MySQL 8.
 
-Os dados dos painéis são recuperados por consultas SQL realizadas através do `JdbcTemplate`, utilizando relacionamentos entre tabelas com `JOIN`.
+### 1. Preparar o banco de dados
 
-A persistência é implementada diretamente com JDBC, sem utilização de ORM ou JPA.
+Escolha **apenas uma** das opções:
 
-## Banco de dados
+- **Instalação nova:** execute `banco.sql` no MySQL Workbench. Ele cria o banco e todos os registros demonstrativos, incluindo o administrador. **Atenção: esse script recria as tabelas e apaga os dados anteriores.**
+- **Banco que já possui o painel ADMIN:** faça backup e execute somente `atualizacao-gestao-academica.sql`.
+- **Versão antiga sem ADMIN:** execute primeiro `atualizacao-admin.sql` e depois `atualizacao-gestao-academica.sql`.
 
-O projeto utiliza MySQL e possui cinco tabelas principais:
+O script de gestão é não destrutivo: cria `turmas`, migra os códigos já usados, mantém os IDs legados, adiciona chaves estrangeiras e cria restrições únicas somente quando os dados existentes são compatíveis. Ele pode ser reexecutado sem duplicar registros. Não reexecute `banco.sql` em um banco em uso.
 
-| Tabela | Descrição |
-| --- | --- |
-| `perfis` | Identificação dos perfis de acesso |
-| `usuarios` | Dados dos usuários e credenciais |
-| `disciplinas` | Informações das disciplinas |
-| `salas` | Identificação, localização e tipo de sala |
-| `alocacoes` | Associação de disciplinas, professores, turmas, salas e horários |
-
-O arquivo `banco.sql`, localizado na raiz do projeto, contém os comandos para criação da estrutura e inserção dos dados demonstrativos.
-
-**Atenção:** a execução do script recria as tabelas e restaura os dados iniciais.
-
-## Instalação e execução
-
-### Pré-requisitos
-
-- JDK 17 ou superior
-- Maven 3.9 ou superior
-- MySQL 8.0
-
-### 1. Clonar o repositório
+No cliente de linha de comando do MySQL:
 
 ```powershell
-git clone https://github.com/GabrielMarquesxz/portal-academico.git
-cd portal-academico
+mysql -u root -p -P 3307 -e "source C:/caminho/portal-academico/atualizacao-gestao-academica.sql"
 ```
 
-### 2. Configurar o banco de dados
+### 2. Configurar a conexão
 
-Abra o arquivo `banco.sql` no MySQL Workbench e execute o script para criar o banco `portal_academico` e seus dados iniciais.
-
-### 3. Configurar a conexão
-
-O arquivo `src/main/resources/application.properties` utiliza variáveis de ambiente para definir a conexão:
-
-```properties
-spring.datasource.url=jdbc:mysql://127.0.0.1:${DB_PORT:3306}/portal_academico?useUnicode=true&characterEncoding=UTF-8
-spring.datasource.username=${DB_USER:root}
-spring.datasource.password=${DB_PASSWORD:}
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-joinfaces.faces-servlet.url-mappings=*.xhtml
-server.port=${SERVER_PORT:8080}
-```
-
-Exemplo de configuração no PowerShell:
+Defina a conexão no PowerShell antes de iniciar. Esses valores ficam somente no terminal e não são enviados ao Git:
 
 ```powershell
-$env:DB_USER="root"
-$env:DB_PORT="3306"
-$env:SERVER_PORT="8080"
+$env:DB_HOST = "127.0.0.1"
+$env:DB_PORT = "3306"
+$env:DB_NAME = "portal_academico"
+$env:DB_USER = "root"
 $env:DB_PASSWORD = Read-Host "Senha do MySQL"
+$env:SERVER_PORT = "8080"
 ```
 
-As variáveis devem ser ajustadas de acordo com o ambiente de execução.
+Adapte as portas ao seu ambiente. Não grave credenciais reais em `application.properties`.
 
-### 4. Executar a aplicação
-
-No terminal, a partir da raiz do projeto:
+### 3. Executar
 
 ```powershell
 mvn spring-boot:run
 ```
 
-Com a configuração padrão, a aplicação estará disponível em:
+Abra `http://localhost:8080/login.xhtml` (ou a porta definida em `SERVER_PORT`).
 
-**http://localhost:8080/login.xhtml**
+## Contas de demonstração
 
-## Usuários de demonstração
+| Login | Senha | Perfil | Uso |
+| --- | --- | --- | --- |
+| `aluno1` | `senha123` | Aluno | Ana Souza (ADS1) |
+| `aluno2` | `senha123` | Aluno | Bruno Lima (ADS2) |
+| `prof1` | `senha123` | Professor | Carla Mendes |
+| `prof2` | `senha123` | Professor | Daniel Costa |
+| `prof3` | `senha123` | Professor | Marcos Oliveira (sem aulas inicialmente) |
+| `admin1` | `senha123` | ADMIN | Coordenação Acadêmica |
 
-O banco de dados inclui cinco contas para testes funcionais.
+As credenciais são exclusivamente demonstrativas; não utilize esse banco com dados reais ou em um servidor público.
 
-| Usuário | Senha | Perfil |
-| --- | --- | --- |
-| `aluno1` | `senha123` | Aluno — Ana Souza |
-| `aluno2` | `senha123` | Aluno — Bruno Lima |
-| `prof1` | `senha123` | Professor — Carla Mendes |
-| `prof2` | `senha123` | Professor — Daniel Costa |
-| `prof3` | `senha123` | Professor — Marcos Oliveira |
+## Testes sugeridos
 
-As senhas são exclusivas do ambiente demonstrativo e são armazenadas no banco utilizando hashes BCrypt.
+1. Entre com `admin1` e cadastre a turma `ADS3`.
+2. Cadastre um professor, um aluno vinculado à ADS3, a disciplina `Algoritmos` e o laboratório `L03` no bloco C.
+3. Crie uma alocação de Algoritmos para ADS3 usando o novo professor e laboratório.
+4. Saia e entre com o novo professor; confirme a aula em sua grade.
+5. Entre com o novo aluno, escolha o dia da alocação e confirme a mesma aula.
+6. Tente repetir login, turma, sala e disciplina; os cadastros devem ser recusados.
+7. Tente cadastrar outra aula no mesmo período para a mesma sala, professor ou turma; deve aparecer uma mensagem de conflito.
+8. Entre como aluno e professor e tente acessar `/admin.xhtml`; cada perfil deve voltar ao próprio painel.
+9. Entre com `admin1`, exclua uma alocação e confirme que ela desaparece dos painéis relacionados.
 
-## Escopo do projeto
+Todos os seletores do formulário de alocação consultam o banco; não há listas fixas ou dados simulados no código.
 
-O Portal Acadêmico implementa as funcionalidades essenciais de autenticação, consulta de aulas e direcionamento por perfil.
+**Observação:** os dados de aula são recorrentes por **dia da semana**, não por uma data de calendário. A tela administrativa permite cadastrar e excluir alocações; ainda não há edição nesta versão.
 
-A aplicação apresenta uma arquitetura modular, com separação das responsabilidades entre interface, regras de negócio e persistência.
+## Limites do projeto
 
-O sistema utiliza uma implementação simplificada de autenticação e não contempla funcionalidades administrativas, gerenciamento de matrículas ou edição de horários pela interface.
-
-Para utilização em produção, seriam necessários controles adicionais de segurança, gerenciamento de usuários e procedimentos de manutenção dos dados.
+É uma demonstração acadêmica, não um sistema de produção. Para uso real ainda seriam necessários edição/exclusão controlada dos cadastros mestres, trilha de auditoria, recuperação de senha, regras de matrícula e controles adicionais contra alterações diretas no banco.

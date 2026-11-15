@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core" xmlns:pt="jakarta.faces.passthrough" lang="pt-BR">
+<f:metadata><f:viewAction action="#{adminBean.abrir}" /></f:metadata>
+<h:head>
+    <title>Portal Acadêmico | Coordenação</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <h:outputStylesheet library="css" name="estilo.css" />
+</h:head>
+<h:body>
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="brand"><h:graphicImage library="images" name="portal-livros.png"
+                                                       styleClass="brand-logo" alt="Portal Acadêmico" />
+                <span class="brand-copy"><strong>PORTAL ACADÊMICO</strong></span></div>
+            <div class="header-controls">
+                <span class="header-user"><h:outputText value="#{adminBean.usuario.nome}" /></span>
+                <h:form><h:commandButton value="Sair da conta" action="#{adminBean.sair}" styleClass="button button-logout" /></h:form>
+            </div>
+        </div>
+    </header>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <p class="nav-caption">COORDENAÇÃO ACADÊMICA</p>
+            <nav class="side-nav" aria-label="Navegação administrativa">
+                <a href="#inicio" class="nav-link nav-active"><span class="nav-icon">▦</span> Visão geral</a>
+                <a href="#cadastrar" class="nav-link"><span class="nav-icon">▤</span> Alocações</a>
+                <a href="#turmas" class="nav-link"><span class="nav-icon">T</span> Turmas</a>
+                <a href="#alunos" class="nav-link"><span class="nav-icon">A</span> Alunos</a>
+                <a href="#professores" class="nav-link"><span class="nav-icon">P</span> Professores</a>
+                <a href="#salas" class="nav-link"><span class="nav-icon">S</span> Salas e laboratórios</a>
+                <a href="#disciplinas" class="nav-link"><span class="nav-icon">D</span> Disciplinas</a>
+            </nav>
+        </aside>
+        <main class="dashboard" id="inicio">
+            <div class="page-topline"><span>INÍCIO / COORDENAÇÃO</span><span>GESTÃO DE HORÁRIOS</span></div>
+            <div class="page-heading"><div><span class="small-label">ÁREA ADMINISTRATIVA</span>
+                <h1>Gestão de alocações</h1>
+                <p class="muted">Organize professores, turmas, disciplinas e salas em um só lugar.</p></div>
+                <div class="user-pill"><span class="avatar-circle">●</span><span><strong><h:outputText value="#{adminBean.usuario.nome}" /></strong>
+                <small>Coordenação acadêmica</small></span></div></div>
+
+            <section class="stats-grid admin-stats" aria-label="Resumo das alocações">
+                <article class="stat-card"><div class="stat-top"><span>ALOCAÇÕES</span><span class="stat-icon">▤</span></div>
+                    <strong class="stat-number"><h:outputText value="#{adminBean.totalAlocacoes}" /></strong>
+                    <small>Horários cadastrados</small></article>
+                <article class="stat-card"><div class="stat-top"><span>DOCENTES ALOCADOS</span><span class="stat-icon">◉</span></div>
+                    <strong class="stat-number"><h:outputText value="#{adminBean.totalProfessores}" /></strong>
+                    <small>Professores com horários</small></article>
+                <article class="stat-card"><div class="stat-top"><span>LABORATÓRIOS</span><span class="stat-icon">◫</span></div>
+                    <strong class="stat-number"><h:outputText value="#{adminBean.totalLaboratorios}" /></strong>
+                    <small>Aulas práticas registradas</small></article>
+            </section>
+
+            <h:outputText value="#{adminBean.sucesso}" rendered="#{not empty adminBean.sucesso}" styleClass="admin-success" />
+            <h:outputText value="#{adminBean.erro}" rendered="#{not empty adminBean.erro}" styleClass="alert" />
+
+            <section class="content-card" id="cadastrar">
+                <div class="section-header"><div><span class="section-eyebrow">PLANEJAMENTO ACADÊMICO</span>
+                    <h2>Cadastrar nova aula</h2><p class="muted">Selecione as informações e confirme a alocação.</p></div>
+                </div>
+                <h:form id="cadastroForm" styleClass="admin-form">
+                    <h:messages styleClass="alert" globalOnly="true" />
+                    <div class="admin-fields">
+                        <div class="admin-field">
+                            <h:outputLabel for="disciplina" value="Disciplina" />
+                            <h:selectOneMenu id="disciplina" styleClass="input" value="#{adminBean.disciplinaId}"
+                                             required="true" requiredMessage="Selecione uma disciplina.">
+                                <f:selectItem itemLabel="Selecione a disciplina" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{adminBean.disciplinas}" var="opcao"
+                                               itemLabel="#{opcao.nome}" itemValue="#{opcao.id}" />
+                            </h:selectOneMenu>
+                            <h:message for="disciplina" styleClass="field-error" />
+                        </div>
+                        <div class="admin-field">
+                            <h:outputLabel for="professor" value="Professor" />
+                            <h:selectOneMenu id="professor" styleClass="input" value="#{adminBean.professorId}"
+                                             required="true" requiredMessage="Selecione um professor.">
+                                <f:selectItem itemLabel="Selecione o professor" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{adminBean.professores}" var="opcao"
+                                               itemLabel="#{opcao.nome}" itemValue="#{opcao.id}" />
+                            </h:selectOneMenu>
+                            <h:message for="professor" styleClass="field-error" />
+                        </div>
+                        <div class="admin-field">
+                            <h:outputLabel for="turma" value="Turma" />
+                            <h:selectOneMenu id="turma" styleClass="input" value="#{adminBean.turma}"
+                                             required="true" requiredMessage="Selecione uma turma.">
+                                <f:selectItem itemLabel="Selecione a turma" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{adminBean.turmas}" var="turmaOpcao"
+                                               itemLabel="#{turmaOpcao.rotulo}" itemValue="#{turmaOpcao.codigo}" />
+                            </h:selectOneMenu>
+                            <h:message for="turma" styleClass="field-error" />
+                        </div>
+                        <div class="admin-field">
+                            <h:outputLabel for="dia" value="Dia da semana" />
+                            <h:selectOneMenu id="dia" styleClass="input" value="#{adminBean.diaSemana}"
+                                             required="true" requiredMessage="Selecione um dia.">
+                                <f:selectItem itemLabel="Selecione o dia" itemValue="" noSelectionOption="true" />
+                                <f:selectItem itemLabel="Segunda-feira" itemValue="1" />
+                                <f:selectItem itemLabel="Terça-feira" itemValue="2" />
+                                <f:selectItem itemLabel="Quarta-feira" itemValue="3" />
+                                <f:selectItem itemLabel="Quinta-feira" itemValue="4" />
+                                <f:selectItem itemLabel="Sexta-feira" itemValue="5" />
+                            </h:selectOneMenu>
+                            <h:message for="dia" styleClass="field-error" />
+                        </div>
+                        <div class="admin-field">
+                            <h:outputLabel for="inicio" value="Horário de início" />
+                            <h:inputText id="inicio" styleClass="input" pt:type="time" value="#{adminBean.horaInicio}"
+                                         required="true" requiredMessage="Informe o início." />
+                            <h:message for="inicio" styleClass="field-error" />
+                        </div>
+                        <div class="admin-field">
+                            <h:outputLabel for="fim" value="Horário de término" />
+                            <h:inputText id="fim" styleClass="input" pt:type="time" value="#{adminBean.horaFim}"
+                                         required="true" requiredMessage="Informe o término." />
+                            <h:message for="fim" styleClass="field-error" />
+                        </div>
+                        <div class="admin-field admin-field-wide">
+                            <h:outputLabel for="sala" value="Sala ou laboratório" />
+                            <h:selectOneMenu id="sala" styleClass="input" value="#{adminBean.salaId}"
+                                             required="true" requiredMessage="Selecione uma sala.">
+                                <f:selectItem itemLabel="Selecione a sala" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{adminBean.salas}" var="opcao"
+                                               itemLabel="#{opcao.nome}" itemValue="#{opcao.id}" />
+                            </h:selectOneMenu>
+                            <h:message for="sala" styleClass="field-error" />
+                        </div>
+                    </div>
+                    <div class="admin-form-footer">
+                        <p>O sistema verifica se a sala, o professor ou a turma já estão ocupados no horário.</p>
+                        <h:commandButton value="Cadastrar alocação" action="#{adminBean.salvar}"
+                                         styleClass="button button-primary admin-submit" />
+                    </div>
+                </h:form>
+            </section>
+
+            <section class="content-card" id="alocacoes">
+                <div class="section-header"><div><span class="section-eyebrow">CONSULTA GERAL</span>
+                    <h2>Alocações cadastradas</h2>
+                    <p class="muted">As novas aulas aparecem aqui e nos painéis de alunos e professores.</p></div>
+                    <span class="soft-badge"><h:outputText value="#{adminBean.totalAlocacoes}" /> registros</span>
+                </div>
+                <h:panelGroup layout="block" rendered="#{empty adminBean.alocacoes}" styleClass="empty-state">
+                    <span class="empty-icon">▤</span><strong>Sem alocações cadastradas</strong>
+                    <p>Cadastre a primeira aula pelo formulário acima.</p>
+                </h:panelGroup>
+                <div class="table-wrap">
+                    <h:dataTable value="#{adminBean.alocacoes}" var="aula" styleClass="tabela"
+                                 rendered="#{not empty adminBean.alocacoes}" headerClass="tabela-cabecalho">
+                        <h:column><f:facet name="header">Dia</f:facet><h:outputText value="#{aula.diaTexto}" /></h:column>
+                        <h:column><f:facet name="header">Disciplina</f:facet><h:outputText value="#{aula.disciplina}" /></h:column>
+                        <h:column><f:facet name="header">Professor</f:facet><h:outputText value="#{aula.professor}" /></h:column>
+                        <h:column><f:facet name="header">Turma</f:facet><h:outputText value="#{aula.turma}" /></h:column>
+                        <h:column><f:facet name="header">Horário</f:facet><h:outputText value="#{aula.horario}" /></h:column>
+                        <h:column><f:facet name="header">Sala</f:facet><h:outputText value="#{aula.local}" /></h:column>
+                        <h:column><f:facet name="header">Tipo</f:facet><h:outputText value="#{aula.tipoAula}" styleClass="#{aula.tipoSala eq 'LABORATORIO' ? 'chip chip-lab' : 'chip chip-theory'}" /></h:column>
+                        <h:column>
+                            <f:facet name="header">Ações</f:facet>
+                            <h:form>
+                                <h:commandButton value="Excluir" action="#{adminBean.excluir(aula.id)}"
+                                                 styleClass="button button-danger button-compact"
+                                                 onclick="return confirm('Deseja realmente excluir esta alocação?');" />
+                            </h:form>
+                        </h:column>
+                    </h:dataTable>
+                </div>
+            </section>
+
+            <section class="content-card" id="turmas">
+                <div class="section-header"><div><span class="section-eyebrow">ESTRUTURA ACADÊMICA</span>
+                    <h2>Turmas</h2><p class="muted">Cadastre os grupos usados por alunos e alocações.</p></div>
+                    <span class="soft-badge"><h:outputText value="#{adminBean.turmas.size()}" /> turmas</span>
+                </div>
+                <div class="management-layout">
+                    <h:form id="turmaForm" styleClass="management-form">
+                        <h3>Nova turma</h3>
+                        <p class="form-help">O código deve ser único, como ADS3.</p>
+                        <div class="management-form-grid">
+                            <div class="admin-field">
+                                <h:outputLabel for="codigo" value="Código" />
+                                <h:inputText id="codigo" value="#{adminBean.novaTurmaCodigo}" styleClass="input"
+                                             maxlength="10" required="true" requiredMessage="Informe o código da turma." />
+                                <h:message for="codigo" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field">
+                                <h:outputLabel for="nome" value="Nome ou descrição" />
+                                <h:inputText id="nome" value="#{adminBean.novaTurmaNome}" styleClass="input"
+                                             maxlength="100" required="true" requiredMessage="Informe o nome da turma." />
+                                <h:message for="nome" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field management-field-full">
+                                <h:outputLabel for="curso" value="Curso (opcional)" />
+                                <h:inputText id="curso" value="#{adminBean.novaTurmaCurso}" styleClass="input" maxlength="100" />
+                                <h:message for="curso" styleClass="field-error" />
+                            </div>
+                        </div>
+                        <h:commandButton value="Cadastrar turma" action="#{adminBean.salvarTurma}"
+                                         styleClass="button button-primary management-submit" />
+                    </h:form>
+                    <div class="management-list">
+                        <h3>Turmas cadastradas</h3>
+                        <h:panelGroup layout="block" rendered="#{empty adminBean.turmas}" styleClass="empty-state compact-empty">
+                            <strong>Nenhuma turma cadastrada</strong><p>Use o formulário para criar a primeira.</p>
+                        </h:panelGroup>
+                        <div class="table-wrap">
+                            <h:dataTable value="#{adminBean.turmas}" var="item" styleClass="tabela management-table"
+                                         rendered="#{not empty adminBean.turmas}">
+                                <h:column><f:facet name="header">Código</f:facet><strong><h:outputText value="#{item.codigo}" /></strong></h:column>
+                                <h:column><f:facet name="header">Descrição</f:facet><h:outputText value="#{item.nome}" /></h:column>
+                                <h:column><f:facet name="header">Curso</f:facet><h:outputText value="#{item.cursoExibicao}" /></h:column>
+                            </h:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-card" id="alunos">
+                <div class="section-header"><div><span class="section-eyebrow">USUÁRIOS</span>
+                    <h2>Alunos</h2><p class="muted">Crie acessos de alunos vinculados a uma turma válida.</p></div>
+                    <span class="soft-badge"><h:outputText value="#{adminBean.alunos.size()}" /> alunos</span>
+                </div>
+                <div class="management-layout">
+                    <h:form id="alunoForm" styleClass="management-form">
+                        <h3>Novo aluno</h3>
+                        <p class="form-help">A senha é protegida com BCrypt antes de ser gravada.</p>
+                        <div class="management-form-grid">
+                            <div class="admin-field management-field-full">
+                                <h:outputLabel for="nome" value="Nome completo" />
+                                <h:inputText id="nome" value="#{adminBean.novoAlunoNome}" styleClass="input"
+                                             maxlength="100" required="true" requiredMessage="Informe o nome do aluno." />
+                                <h:message for="nome" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field">
+                                <h:outputLabel for="login" value="Login" />
+                                <h:inputText id="login" value="#{adminBean.novoAlunoLogin}" styleClass="input"
+                                             maxlength="40" required="true" requiredMessage="Informe o login." />
+                                <h:message for="login" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field">
+                                <h:outputLabel for="senha" value="Senha inicial" />
+                                <h:inputSecret id="senha" value="#{adminBean.novoAlunoSenha}" styleClass="input"
+                                               maxlength="72" required="true" requiredMessage="Informe a senha inicial." />
+                                <h:message for="senha" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field management-field-full">
+                                <h:outputLabel for="turma" value="Turma" />
+                                <h:selectOneMenu id="turma" value="#{adminBean.novoAlunoTurma}" styleClass="input"
+                                                 required="true" requiredMessage="Selecione a turma.">
+                                    <f:selectItem itemLabel="Selecione a turma" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{adminBean.turmas}" var="opcaoTurma"
+                                                   itemLabel="#{opcaoTurma.rotulo}" itemValue="#{opcaoTurma.codigo}" />
+                                </h:selectOneMenu>
+                                <h:message for="turma" styleClass="field-error" />
+                            </div>
+                        </div>
+                        <h:commandButton value="Cadastrar aluno" action="#{adminBean.salvarAluno}"
+                                         styleClass="button button-primary management-submit" />
+                    </h:form>
+                    <div class="management-list">
+                        <h3>Alunos cadastrados</h3>
+                        <h:panelGroup layout="block" rendered="#{empty adminBean.alunos}" styleClass="empty-state compact-empty">
+                            <strong>Nenhum aluno cadastrado</strong><p>Cadastre uma turma antes de criar alunos.</p>
+                        </h:panelGroup>
+                        <div class="table-wrap">
+                            <h:dataTable value="#{adminBean.alunos}" var="item" styleClass="tabela management-table"
+                                         rendered="#{not empty adminBean.alunos}">
+                                <h:column><f:facet name="header">Nome</f:facet><h:outputText value="#{item.nome}" /></h:column>
+                                <h:column><f:facet name="header">Login</f:facet><h:outputText value="#{item.login}" /></h:column>
+                                <h:column><f:facet name="header">Turma</f:facet><span class="chip chip-theory"><h:outputText value="#{item.turma}" /></span></h:column>
+                            </h:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-card" id="professores">
+                <div class="section-header"><div><span class="section-eyebrow">USUÁRIOS</span>
+                    <h2>Professores</h2><p class="muted">Crie acessos docentes disponíveis imediatamente nas alocações.</p></div>
+                    <span class="soft-badge"><h:outputText value="#{adminBean.professoresCadastrados.size()}" /> professores</span>
+                </div>
+                <div class="management-layout">
+                    <h:form id="professorForm" styleClass="management-form">
+                        <h3>Novo professor</h3>
+                        <p class="form-help">O perfil PROFESSOR é atribuído automaticamente.</p>
+                        <div class="management-form-grid">
+                            <div class="admin-field management-field-full">
+                                <h:outputLabel for="nome" value="Nome completo" />
+                                <h:inputText id="nome" value="#{adminBean.novoProfessorNome}" styleClass="input"
+                                             maxlength="100" required="true" requiredMessage="Informe o nome do professor." />
+                                <h:message for="nome" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field">
+                                <h:outputLabel for="login" value="Login" />
+                                <h:inputText id="login" value="#{adminBean.novoProfessorLogin}" styleClass="input"
+                                             maxlength="40" required="true" requiredMessage="Informe o login." />
+                                <h:message for="login" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field">
+                                <h:outputLabel for="senha" value="Senha inicial" />
+                                <h:inputSecret id="senha" value="#{adminBean.novoProfessorSenha}" styleClass="input"
+                                               maxlength="72" required="true" requiredMessage="Informe a senha inicial." />
+                                <h:message for="senha" styleClass="field-error" />
+                            </div>
+                        </div>
+                        <h:commandButton value="Cadastrar professor" action="#{adminBean.salvarProfessor}"
+                                         styleClass="button button-primary management-submit" />
+                    </h:form>
+                    <div class="management-list">
+                        <h3>Professores cadastrados</h3>
+                        <h:panelGroup layout="block" rendered="#{empty adminBean.professoresCadastrados}" styleClass="empty-state compact-empty">
+                            <strong>Nenhum professor cadastrado</strong><p>Use o formulário para criar o primeiro acesso.</p>
+                        </h:panelGroup>
+                        <div class="table-wrap">
+                            <h:dataTable value="#{adminBean.professoresCadastrados}" var="item" styleClass="tabela management-table"
+                                         rendered="#{not empty adminBean.professoresCadastrados}">
+                                <h:column><f:facet name="header">Nome</f:facet><h:outputText value="#{item.nome}" /></h:column>
+                                <h:column><f:facet name="header">Login</f:facet><h:outputText value="#{item.login}" /></h:column>
+                            </h:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-card" id="salas">
+                <div class="section-header"><div><span class="section-eyebrow">INFRAESTRUTURA</span>
+                    <h2>Salas e laboratórios</h2><p class="muted">Gerencie os ambientes disponíveis para as aulas.</p></div>
+                    <span class="soft-badge"><h:outputText value="#{adminBean.salasCadastradas.size()}" /> ambientes</span>
+                </div>
+                <div class="management-layout">
+                    <h:form id="salaForm" styleClass="management-form">
+                        <h3>Novo ambiente</h3>
+                        <p class="form-help">A combinação de bloco e número não pode se repetir.</p>
+                        <div class="management-form-grid">
+                            <div class="admin-field">
+                                <h:outputLabel for="bloco" value="Bloco" />
+                                <h:inputText id="bloco" value="#{adminBean.novaSalaBloco}" styleClass="input"
+                                             maxlength="10" required="true" requiredMessage="Informe o bloco." />
+                                <h:message for="bloco" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field">
+                                <h:outputLabel for="numero" value="Número da sala" />
+                                <h:inputText id="numero" value="#{adminBean.novaSalaNumero}" styleClass="input"
+                                             maxlength="10" required="true" requiredMessage="Informe o número da sala." />
+                                <h:message for="numero" styleClass="field-error" />
+                            </div>
+                            <div class="admin-field management-field-full">
+                                <h:outputLabel for="tipo" value="Tipo de ambiente" />
+                                <h:selectOneMenu id="tipo" value="#{adminBean.novaSalaTipo}" styleClass="input"
+                                                 required="true" requiredMessage="Selecione o tipo de ambiente.">
+                                    <f:selectItem itemLabel="Selecione o tipo" itemValue="" noSelectionOption="true" />
+                                    <f:selectItem itemLabel="Sala teórica" itemValue="TEORICA" />
+                                    <f:selectItem itemLabel="Laboratório" itemValue="LABORATORIO" />
+                                </h:selectOneMenu>
+                                <h:message for="tipo" styleClass="field-error" />
+                            </div>
+                        </div>
+                        <h:commandButton value="Cadastrar ambiente" action="#{adminBean.salvarSala}"
+                                         styleClass="button button-primary management-submit" />
+                    </h:form>
+                    <div class="management-list">
+                        <h3>Ambientes cadastrados</h3>
+                        <h:panelGroup layout="block" rendered="#{empty adminBean.salasCadastradas}" styleClass="empty-state compact-empty">
+                            <strong>Nenhum ambiente cadastrado</strong><p>Use o formulário para criar o primeiro.</p>
+                        </h:panelGroup>
+                        <div class="table-wrap">
+                            <h:dataTable value="#{adminBean.salasCadastradas}" var="item" styleClass="tabela management-table"
+                                         rendered="#{not empty adminBean.salasCadastradas}">
+                                <h:column><f:facet name="header">Bloco</f:facet><h:outputText value="#{item.bloco}" /></h:column>
+                                <h:column><f:facet name="header">Número</f:facet><h:outputText value="#{item.numero}" /></h:column>
+                                <h:column><f:facet name="header">Tipo</f:facet><span class="#{item.tipo eq 'LABORATORIO' ? 'chip chip-lab' : 'chip chip-theory'}"><h:outputText value="#{item.tipoExibicao}" /></span></h:column>
+                            </h:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-card" id="disciplinas">
+                <div class="section-header"><div><span class="section-eyebrow">CATÁLOGO ACADÊMICO</span>
+                    <h2>Disciplinas</h2><p class="muted">Cadastre componentes curriculares usados nas alocações.</p></div>
+                    <span class="soft-badge"><h:outputText value="#{adminBean.disciplinasCadastradas.size()}" /> disciplinas</span>
+                </div>
+                <div class="management-layout">
+                    <h:form id="disciplinaForm" styleClass="management-form">
+                        <h3>Nova disciplina</h3>
+                        <p class="form-help">Nomes repetidos também são detectados sem diferenciar maiúsculas e minúsculas.</p>
+                        <div class="management-form-grid">
+                            <div class="admin-field management-field-full">
+                                <h:outputLabel for="nome" value="Nome da disciplina" />
+                                <h:inputText id="nome" value="#{adminBean.novaDisciplinaNome}" styleClass="input"
+                                             maxlength="100" required="true" requiredMessage="Informe o nome da disciplina." />
+                                <h:message for="nome" styleClass="field-error" />
+                            </div>
+                        </div>
+                        <h:commandButton value="Cadastrar disciplina" action="#{adminBean.salvarDisciplina}"
+                                         styleClass="button button-primary management-submit" />
+                    </h:form>
+                    <div class="management-list">
+                        <h3>Disciplinas cadastradas</h3>
+                        <h:panelGroup layout="block" rendered="#{empty adminBean.disciplinasCadastradas}" styleClass="empty-state compact-empty">
+                            <strong>Nenhuma disciplina cadastrada</strong><p>Use o formulário para criar a primeira.</p>
+                        </h:panelGroup>
+                        <div class="table-wrap">
+                            <h:dataTable value="#{adminBean.disciplinasCadastradas}" var="item" styleClass="tabela management-table"
+                                         rendered="#{not empty adminBean.disciplinasCadastradas}">
+                                <h:column><f:facet name="header">Nome</f:facet><h:outputText value="#{item.nome}" /></h:column>
+                            </h:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</h:body>
+</html>

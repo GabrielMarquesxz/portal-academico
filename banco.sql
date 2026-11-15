@@ -1,5 +1,5 @@
 -- PROJETO DIDÁTICO: execute no MySQL 8 (Workbench ou cliente MySQL).
--- ATENÇÃO: executá-lo novamente recria as cinco tabelas do exemplo.
+-- ATENÇÃO: executá-lo novamente recria todas as tabelas do exemplo.
 CREATE DATABASE IF NOT EXISTS portal_academico
     CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE portal_academico;
@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS alocacoes;
 DROP TABLE IF EXISTS usuarios;
 DROP TABLE IF EXISTS disciplinas;
 DROP TABLE IF EXISTS salas;
+DROP TABLE IF EXISTS turmas;
 DROP TABLE IF EXISTS perfis;
 
 CREATE TABLE perfis (
@@ -15,26 +16,36 @@ CREATE TABLE perfis (
     nome VARCHAR(20) NOT NULL UNIQUE
 );
 
+CREATE TABLE turmas (
+    codigo VARCHAR(10) PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    curso VARCHAR(100)
+);
+
 CREATE TABLE usuarios (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
     login VARCHAR(40) NOT NULL UNIQUE,
     senha_hash VARCHAR(100) NOT NULL,
     perfil_id INT NOT NULL,
     turma VARCHAR(10),
-    FOREIGN KEY (perfil_id) REFERENCES perfis(id)
+    FOREIGN KEY (perfil_id) REFERENCES perfis(id),
+    FOREIGN KEY (turma) REFERENCES turmas(codigo)
 );
 
 CREATE TABLE salas (
-    id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     bloco VARCHAR(10) NOT NULL,
     numero VARCHAR(10) NOT NULL,
-    tipo VARCHAR(20) NOT NULL -- TEORICA ou LABORATORIO
+    tipo VARCHAR(20) NOT NULL, -- TEORICA ou LABORATORIO
+    UNIQUE KEY uk_salas_bloco_numero (bloco, numero),
+    CHECK (tipo IN ('TEORICA', 'LABORATORIO'))
 );
 
 CREATE TABLE disciplinas (
-    id INT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100) NOT NULL,
+    UNIQUE KEY uk_disciplinas_nome (nome)
 );
 
 CREATE TABLE alocacoes (
@@ -49,12 +60,17 @@ CREATE TABLE alocacoes (
     FOREIGN KEY (disciplina_id) REFERENCES disciplinas(id),
     FOREIGN KEY (professor_id) REFERENCES usuarios(id),
     FOREIGN KEY (sala_id) REFERENCES salas(id),
-    CHECK (dia_semana BETWEEN 1 AND 7),
+    FOREIGN KEY (turma) REFERENCES turmas(codigo),
+    CHECK (dia_semana BETWEEN 1 AND 5),
     CHECK (hora_fim > hora_inicio)
 );
 
 INSERT INTO perfis (id, nome) VALUES
     (1, 'ALUNO'), (2, 'PROFESSOR');
+
+INSERT INTO turmas (codigo, nome, curso) VALUES
+    ('ADS1', 'Análise e Desenvolvimento de Sistemas — Turma 1', 'Análise e Desenvolvimento de Sistemas'),
+    ('ADS2', 'Análise e Desenvolvimento de Sistemas — Turma 2', 'Análise e Desenvolvimento de Sistemas');
 
 -- Cinco usuários; senha de TESTE: senha123 (hash BCrypt, não texto puro).
 INSERT INTO usuarios (id, nome, login, senha_hash, perfil_id, turma) VALUES
@@ -63,13 +79,16 @@ INSERT INTO usuarios (id, nome, login, senha_hash, perfil_id, turma) VALUES
     (3, 'Carla Mendes', 'prof1', '$2y$10$y6mjSo.wyChNud7YuskZ7uV0T7nEbReFqzUVKIJuPQM95iJ1dn6iO', 2, NULL),
     (4, 'Daniel Costa', 'prof2', '$2y$10$8kQ/VLz0AWs2cI2mKpwChuYufy0xDz82r1KVxSEdyO0Rd9Az9kWGO', 2, NULL);
 
-INSERT INTO usuarios
-    (id, nome, login, senha_hash, perfil_id, turma)
-SELECT
-    5, 'Marcos Oliveira', 'prof3',
-    senha_hash, perfil_id, NULL
-FROM usuarios
-WHERE login = 'prof1';
+-- Professor sem horários: cenário de consulta vazia.
+INSERT INTO usuarios (id, nome, login, senha_hash, perfil_id, turma)
+SELECT 5, 'Marcos Oliveira', 'prof3', senha_hash, perfil_id, NULL
+FROM usuarios WHERE login = 'prof1';
+
+-- Conta demonstrativa da coordenação (senha senha123, hash copiado de prof1).
+INSERT INTO perfis (id, nome) VALUES (3, 'ADMIN');
+INSERT INTO usuarios (id, nome, login, senha_hash, perfil_id, turma)
+SELECT 6, 'Coordenação Acadêmica', 'admin1', senha_hash, 3, NULL
+FROM usuarios WHERE login = 'prof1';
 
 INSERT INTO salas (id, bloco, numero, tipo) VALUES
     (1, 'A', '101', 'TEORICA'),
@@ -79,8 +98,7 @@ INSERT INTO disciplinas (id, nome) VALUES
     (1, 'Banco de Dados'),
     (2, 'Programação Web');
 
--- Turmas com aulas de segunda a sexta-feira.
--- Cada professor tem aulas teóricas e práticas durante a semana.
+-- Aulas apenas de segunda a sexta, com tipos teórico e prático.
 INSERT INTO alocacoes
     (disciplina_id, professor_id, turma, sala_id, dia_semana, hora_inicio, hora_fim)
 VALUES
