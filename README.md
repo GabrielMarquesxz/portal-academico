@@ -43,19 +43,9 @@ As colunas `usuarios.turma` e `alocacoes.turma` continuam textuais, mas agora re
 
 ### 1. Preparar o banco de dados
 
-Escolha **apenas uma** das opções:
+Para uma instalação nova, execute o arquivo `banco.sql` no MySQL Workbench. Ele contém a estrutura completa da versão 4, incluindo o perfil `ADMIN`, a tabela `turmas` e os registros demonstrativos.
 
-- **Instalação nova:** execute `banco.sql` no MySQL Workbench. Ele cria o banco e todos os registros demonstrativos, incluindo o administrador. **Atenção: esse script recria as tabelas e apaga os dados anteriores.**
-- **Banco que já possui o painel ADMIN:** faça backup e execute somente `atualizacao-gestao-academica.sql`.
-- **Versão antiga sem ADMIN:** execute primeiro `atualizacao-admin.sql` e depois `atualizacao-gestao-academica.sql`.
-
-O script de gestão é não destrutivo: cria `turmas`, migra os códigos já usados, mantém os IDs legados, adiciona chaves estrangeiras e cria restrições únicas somente quando os dados existentes são compatíveis. Ele pode ser reexecutado sem duplicar registros. Não reexecute `banco.sql` em um banco em uso.
-
-No cliente de linha de comando do MySQL:
-
-```powershell
-mysql -u root -p -P 3307 -e "source C:/caminho/portal-academico/atualizacao-gestao-academica.sql"
-```
+**Atenção:** o `banco.sql` recria as tabelas e apaga todos os dados anteriores. Não execute o script novamente sobre um banco que contenha cadastros que precisam ser preservados.
 
 ### 2. Configurar a conexão
 
