@@ -1,0 +1,13 @@
+.git
+.github
+.vscode
+.idea
+target
+*.log
+.env
+.env.*
+*.bak
+*.tmp
+*.zip
+*.jar
+.DS_Store
