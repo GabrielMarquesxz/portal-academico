@@ -2,6 +2,14 @@
 
 Aplicação Java para consulta de aulas e **gestão acadêmica**, com Spring Boot, JSF (JoinFaces), JDBC/JdbcTemplate e MySQL. A interface em verde, branco e laranja é inspirada na identidade visual da UNICEPLAC, mas **não é um sistema oficial da instituição**.
 
+## 🌐 Demonstração online
+
+O Portal Acadêmico está disponível para acesso e testes diretamente pelo navegador.
+
+**[Acessar Portal Acadêmico — Demonstração Online](https://portal-academico-s56.onrender.com/login.xhtml)**
+
+> **Observação:** o sistema utiliza o plano gratuito do Render. O primeiro acesso pode demorar alguns segundos devido à inicialização do servidor.
+
 ## Funcionalidades
 
 - **Aluno:** vê aulas de hoje e a grade semanal de sua turma; filtra por dia.
