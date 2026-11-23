@@ -6,7 +6,7 @@ Aplicação Java para consulta de aulas e **gestão acadêmica**, com Spring Boo
 
 O Portal Acadêmico está disponível para acesso e testes diretamente pelo navegador.
 
-**[Acessar Portal Acadêmico — Demonstração Online](https://portal-academico-s56.onrender.com/login.xhtml)**
+**[Acessar Portal Acadêmico — Demonstração Online](https://portal-academico-s56r.onrender.com/login.xhtml)**
 
 > **Observação:** o sistema utiliza o plano gratuito do Render. O primeiro acesso pode demorar alguns segundos devido à inicialização do servidor.
 
